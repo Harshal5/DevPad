@@ -1,65 +1,87 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<ncurses.h>
+#include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <curses.h>
 
-int check_existance(char *file) {
-	FILE *fp;
-	fp = fopen(file, "r");
-	if(fp != NULL) 
-		return 1;
-	else
-		return 0;
+typedef struct node {
+	char data;
+	int wn;
+	struct node *prev, *next;
+}node;
+
+typedef struct list {
+	node *head, *rear;
+}list;
+
+void init_list(list *l) {
+
+	l->head = NULL;
+	l->rear = NULL;
+
+}
+
+
+void append(list *l, char c) {
+
+	node *new_node;
+	new_node = (node*)malloc(sizeof(node));
+	new_node->data = c;
+	if((l->head) == NULL) {
+		l->rear = NULL;
+		l->head = new_node;
+	}
+	else {
+		new_node->prev = l->rear;
+	}
+	new_node->next = NULL;
+	l->rear = new_node;
+	
+}
+
+
+void print_list(list *l) {
+
+	node* travel;
+	travel = l->head;
+	while(travel != NULL) {
+		printf("%c", travel->data);
+		travel = travel->next;
+	}
+
 }
 
 int main(int argc, char *argv[]) {
-	
-	int cols, rows;
 	FILE *fp;
 	char ch;
-	if(argc == 2) {
-		if(check_existance(argv[1])) {
-			
-			fp = fopen(argv[1], "r");
-			//printf("open");
-			initscr();
-			raw();
-			noecho();
-			getmaxyx(stdscr, rows, cols);
-			keypad(stdscr, TRUE);			
-			while((ch = fgetc(fp)) != EOF) {
-				 printw("%c", ch);			
-			}
+	list l;
+	int i;
+	//if(argc == 2) {
+	//	fp = fopen(argv[1], "w+");
+		initscr();
+		raw();
+		noecho();
+		refresh();
+		keypad(stdscr, TRUE);
+		while(1) {
 			ch = getch();
-			endwin(); 	
-		//fclose(fp);
-
-		}
-	
-		else {
-			initscr();
-			raw();
-			noecho();
-			getmaxyx(stdscr, rows, cols); 				//initscr();
-			keypad(stdscr, TRUE);
-			printw("%d  %d", rows, cols);
-			while((ch = getch()) != (char)KEY_UP) {
-				printw("%c",ch);				
-				
-			}
-			//getch();		
-			refresh();	
-			endwin();			
-
-		}
-	}
-	else {
-		errno = EINVAL;
-		perror("usage");
-		return errno;
-	}	
+			switch(ch) {
+				case 
+			
+			
+			
+			
+			
+			if(ch == 'q')
+				break;
+			addch(ch);
+			//printw("%c ", ch);
+		}	
+		endwin();
+		
+	//}
 	return 0;
 }
