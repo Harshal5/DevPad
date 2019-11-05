@@ -8,11 +8,12 @@
 #include <fcntl.h>
 
 
-int x, y, count = 0;
+int x, y, count = 0, row = 1, column = 0;
 
 typedef struct node {
 	char data;
-	int wn;
+	int col;
+	int ln;
 	struct node *prev, *next;
 }node;
 
@@ -35,8 +36,29 @@ void append(list *l, char c) {
 	node *new_node;
 	new_node = (node*)malloc(sizeof(node));
 	new_node->data = c;
-	new_node->wn = ++count; 
-	if((l->head) == NULL) {
+	
+	
+	
+	
+	if(c == '\n') {
+		new_node->ln = ++row;
+	}
+	else {
+		new_node->ln = row;	
+	}
+	
+	if(cursor->next != NULL) {
+		column = cursor->prev->col;
+		new_node->col = 
+		node *
+	}
+	
+	
+	
+	
+	
+	//new_node->col = ++column; 
+	if((l->head) == NULL) {			//initially
 		new_node->prev = NULL;
 		l->head = new_node;
 	}
@@ -46,7 +68,9 @@ void append(list *l, char c) {
 	}
 	new_node->next = NULL;
 	l->rear = new_node;
-	cursor = l->rear; 
+	
+	//if().....
+	cursor = l->rear; 			//cursor pointer 
 }
 
 
@@ -79,6 +103,7 @@ void save_file(list *l, char *file_name) {
 
 void move_left(list *l) {
 //	printw("%c", cursor->data);
+	cursor = cursor->prev;
 }
 
 
@@ -109,6 +134,12 @@ int main(int argc, char *argv[]) {
 					break;
 				case 'q':
 					break;
+				case '\n':
+					append(&l, ch);
+					addch(ch);
+					move(++y, x = 0);
+					refresh;
+					break;	
 				default : 
 					append(&l, ch);
 					addch(ch);
