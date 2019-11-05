@@ -8,7 +8,7 @@
 #include <fcntl.h>
 
 
-int count = 0;
+int x, y, count = 0;
 
 typedef struct node {
 	char data;
@@ -19,6 +19,8 @@ typedef struct node {
 typedef struct list {
 	node *head, *rear;
 }list;
+
+node *cursor;
 
 void init_list(list *l) {
 
@@ -44,6 +46,7 @@ void append(list *l, char c) {
 	}
 	new_node->next = NULL;
 	l->rear = new_node;
+	cursor = l->rear; 
 }
 
 
@@ -74,6 +77,11 @@ void save_file(list *l, char *file_name) {
 	
 }
 
+void move_left(list *l) {
+//	printw("%c", cursor->data);
+}
+
+
 int main(int argc, char *argv[]) {
 
 	char ch;
@@ -87,18 +95,29 @@ int main(int argc, char *argv[]) {
 		noecho();
 		refresh();
 		keypad(stdscr, TRUE);
+		move(0, 0);
+		getyx(stdscr, y, x);
+	
 		while(1) {
 			ch = getch();
 			switch(ch) {
+				case (char)KEY_LEFT:
+//					printw("left");
+					move_left(&l);
+					move(y, --x);
+					refresh();
+					break;
 				case 'q':
 					break;
 				default : 
 					append(&l, ch);
-					addch(ch);	
+					addch(ch);
+					move(y, ++x);	
 					break;
 			}
+			refresh();	
 			if(ch == 'q') {
-				print_list(&l);
+				//print_list(&l);
 				save_file(&l, argv[1]);
 				break;
 			}
