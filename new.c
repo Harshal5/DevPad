@@ -63,7 +63,6 @@ void append(list *l, char c) {
 void print_list(list *l) {
 	
 	node* travel;
-	int count= 0;
 	travel = l->head;
 	while(travel != NULL) {
 		printw("%c", travel->data);
@@ -89,8 +88,8 @@ void save_file(list *l, char *file_name) {
 
 
 void move_left(list *l) {
-	
-	cursor = cursor->prev;
+	if((cursor->prev) != NULL)
+		cursor = cursor->prev;
 }
 
 
@@ -106,7 +105,7 @@ int main(int argc, char *argv[]) {
 	list l;
 	int i, flag = 0;
 //	printf("ch");
-	if(argc == 2) {
+	if(argc == 1) {
 		//fp = fopen(argv[1], "w+");
 		init_list(&l);
 		initscr();
@@ -128,7 +127,8 @@ int main(int argc, char *argv[]) {
 //					printw("left");
 					flag = 1;
 					move_left(&l);
-					move(y, --x);
+					if(x>0)
+						move(y, --x);
 					refresh();
 					break;
 				case 'q':
@@ -146,7 +146,9 @@ int main(int argc, char *argv[]) {
 					append(&l, ch);
 					//addch(ch);
 					move(y, ++x);
+					clear();	
 					print_list(&l);
+					refresh;
 					if(flag == 0)
 						init_cursor(&l);	
 					break;
