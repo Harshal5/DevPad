@@ -92,6 +92,16 @@ void move_left(list *l) {
 		cursor = cursor->prev;
 }
 
+void move_right(list *l) {
+	
+	if(cursor != NULL) {
+		cursor = cursor->next;
+		move(y, ++x);
+	}	
+	else 
+		cursor = cursor->prev;
+	
+}
 
 void init_cursor(list *l) {
 	
@@ -131,6 +141,16 @@ int main(int argc, char *argv[]) {
 						move(y, --x);
 					refresh();
 					break;
+					
+				case (char)KEY_RIGHT:
+					flag = 1;
+					move_right(&l);
+					
+					refresh();
+					break;
+					
+					
+						
 				case 'q':
 					break;
 				case '\n':
@@ -145,9 +165,10 @@ int main(int argc, char *argv[]) {
 				default : 
 					append(&l, ch);
 					//addch(ch);
-					move(y, ++x);
+					
 					clear();	
 					print_list(&l);
+					move(y, ++x);
 					refresh;
 					if(flag == 0)
 						init_cursor(&l);	
