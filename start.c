@@ -9,91 +9,100 @@
 
 int x, y;
 
-typedef struct node {
+typedef struct hnode {
 	char data;
-	struct node *prev, *next;
-}node;
+	struct hnode *prev, *next;
+}hnode;
 
-typedef struct list {
-	node *head, *rear;
-}list;
+typedef struct hlist {
+	hnode *head, *rear;
+}hlist;
 
-void init_list(list *l) {
-	l->head = NULL;
-	l->rear = NULL;
+typedef struct vnode {
+	hnode *row;
+	struct vnode *prev, *next;
+}vnode;
+
+typedef struct vlist {
+	vnode *top, *bottom;
+}vlist;
+
+void init_hlist(hlist *hl) {
+	hl->head = NULL;
+	hl->rear = NULL;
 }
 
 
-int length (list l) {
-	node *temp;
-	temp = l.head;
+int length (hlist hl) {
+	hnode *temp;
+	temp = hl.head;
 	if(temp == NULL) {
 		return 0;	
 	}
 	int len = 1;
-	if(temp == l.rear){
+	if(temp == hl.rear){
 		return len;
 	}
 	do {
 		temp = temp->next;
 		len++;
-	}while(temp != l.rear);
+	}while(temp != hl.rear);
 	return len;
 }
 
-void insert (list *l, char c, int pos) {
-	node *temp, *new_node;
+void insert (hlist *hl, char c, int pos) {
+	hnode *temp, *new_hnode;
 	int len, i = 0;
-	len = length(*l);
+	len = length(*hl);
 	if (pos <0 || pos > len)
 		return;
 	
 	
-	new_node = (node*)malloc(sizeof(node));
-	new_node->data = c;
+	new_hnode = (hnode*)malloc(sizeof(hnode));
+	new_hnode->data = c;
 	if(len == 0) {
-		l->head = new_node;
-		l->rear = new_node;
-		new_node->prev = NULL;
-		new_node->next = NULL;	
+		hl->head = new_hnode;
+		hl->rear = new_hnode;
+		new_hnode->prev = NULL;
+		new_hnode->next = NULL;	
 		return;
 	}	
 	
 	if(pos == 0) {
-		new_node->next = l->head;
-		new_node->prev = NULL;
-		l->head->prev = new_node;
-		l->head = new_node;
+		new_hnode->next = hl->head;
+		new_hnode->prev = NULL;
+		hl->head->prev = new_hnode;
+		hl->head = new_hnode;
 		return;
 	}
 		
 	if (pos == len) {
-		new_node->prev = l->rear;
-		new_node->next = NULL;
-		l->rear->next = new_node;
-		l->rear = new_node;
+		new_hnode->prev = hl->rear;
+		new_hnode->next = NULL;
+		hl->rear->next = new_hnode;
+		hl->rear = new_hnode;
 		return;
 	}
 	
 	
-	temp = l->head;
+	temp = hl->head;
 	for(i = 0; i < pos - 1; i++) {
 		temp = temp->next;	
 	}
 	
-	new_node->prev = temp;
-	new_node->next = temp->next;
-	temp->next->prev = new_node;
-	temp->next = new_node;
+	new_hnode->prev = temp;
+	new_hnode->next = temp->next;
+	temp->next->prev = new_hnode;
+	temp->next = new_hnode;
 }
 
-void print_list(list l) {
-	node *temp;
-	temp = l.head;	
+void print_hlist(hlist hl) {
+	hnode *temp;
+	temp = hl.head;	
 	if(temp == NULL) {
 		return ;	
 	}
-	if(temp == l.rear){
+	if(temp == hl.rear){
 		printw("%c", temp->data);
 		return;
 	}
@@ -106,12 +115,12 @@ void print_list(list l) {
 }
 
 
-void save_file(list *l, char *file_name) {
+void save_file(hlist *hl, char *file_name) {
 
 	FILE *fp;
 	fp = fopen(file_name, "w+");
-	node* travel;
-	travel = l->head;
+	hnode* travel;
+	travel = hl->head;
 	while(travel != NULL) {
 		fputc(travel->data, fp);
 		travel = travel->next;
@@ -147,10 +156,12 @@ void print_loc(int y, int x) {
 
 int main(int argc, char *argv[]) {
 	char ch;
-	list l;
+	
+	hlist hl;
+
 	int i, flag = 0;
 	if(argc == 2) {
-		init_list(&l);
+		init_hlist(&hl);
 		initscr();
 		raw();
 		noecho();
@@ -164,23 +175,37 @@ int main(int argc, char *argv[]) {
 			switch(ch) {
 				case (char)KEY_LEFT:
 					//printw("left");
-					flag = 1;
+					//flag = 1;
 					//x--;
 					//move_left(&l);
 					if(x>0)
 						move(y, --x);
 					refresh();
 					break;
+				case (char)KEY_RIGHT:
+					//flag = 1;
+					//move_right(&l);
+					if(length(hl) > x)
+						move(y, ++x);
+					refresh();
+					break;
 				case 'q':
 					break;
-				default : 
+				/*case '\n':
 					insert(&l, ch, x);
+					clear();
+					print_hlist(l);
+					move(++y, ++x);
+					refresh();
+					break;	
+				*/default : 
+					insert(&hl, ch, x);
 					//addch(ch);
 					//x++;
 					
 					clear();
 						
-					print_list(l);	
+					print_hlist(hl);	
 					move(y, ++x);
 					refresh();	
 					break;
@@ -188,35 +213,11 @@ int main(int argc, char *argv[]) {
 			refresh();
 			//print_prompt();	
 			if(ch == 'q') {
-				save_file(&l, argv[1]);
+				save_file(&hl, argv[1]);
 				break;
 			}
 		}
 		endwin();
 	}
 	return 0;
-}
-				
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+}	
