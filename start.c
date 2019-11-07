@@ -6,125 +6,45 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
-
+#include "hlist.h"
+#include "vlist.h"
 int x, y;
 
-typedef struct hnode {
-	char data;
-	struct hnode *prev, *next;
-}hnode;
-
-typedef struct hlist {
-	hnode *head, *rear;
-}hlist;
-
-typedef struct vnode {
-	hnode *row;
-	struct vnode *prev, *next;
-}vnode;
-
-typedef struct vlist {
-	vnode *top, *bottom;
-}vlist;
-
-void init_hlist(hlist *hl) {
-	hl->head = NULL;
-	hl->rear = NULL;
-}
-
-
-int length (hlist hl) {
-	hnode *temp;
-	temp = hl.head;
-	if(temp == NULL) {
-		return 0;	
-	}
-	int len = 1;
-	if(temp == hl.rear){
-		return len;
-	}
-	do {
-		temp = temp->next;
-		len++;
-	}while(temp != hl.rear);
-	return len;
-}
-
-void insert (hlist *hl, char c, int pos) {
-	hnode *temp, *new_hnode;
-	int len, i = 0;
-	len = length(*hl);
-	if (pos <0 || pos > len)
-		return;
-	
-	
-	new_hnode = (hnode*)malloc(sizeof(hnode));
-	new_hnode->data = c;
-	if(len == 0) {
-		hl->head = new_hnode;
-		hl->rear = new_hnode;
-		new_hnode->prev = NULL;
-		new_hnode->next = NULL;	
-		return;
-	}	
-	
-	if(pos == 0) {
-		new_hnode->next = hl->head;
-		new_hnode->prev = NULL;
-		hl->head->prev = new_hnode;
-		hl->head = new_hnode;
-		return;
-	}
-		
-	if (pos == len) {
-		new_hnode->prev = hl->rear;
-		new_hnode->next = NULL;
-		hl->rear->next = new_hnode;
-		hl->rear = new_hnode;
-		return;
-	}
-	
-	
-	temp = hl->head;
-	for(i = 0; i < pos - 1; i++) {
-		temp = temp->next;	
-	}
-	
-	new_hnode->prev = temp;
-	new_hnode->next = temp->next;
-	temp->next->prev = new_hnode;
-	temp->next = new_hnode;
-}
-
-void print_hlist(hlist hl) {
-	hnode *temp;
-	temp = hl.head;	
-	if(temp == NULL) {
-		return ;	
-	}
-	if(temp == hl.rear){
-		printw("%c", temp->data);
-		return;
-	}
-		
-	do {
-		printw("%c", temp->data);
-		temp = temp->next;
-	}while(temp != NULL);
-	
-}
-
-
-void save_file(hlist *hl, char *file_name) {
+void save_file(vlist *vl, hlist *hl, char *file_name) {
 
 	FILE *fp;
 	fp = fopen(file_name, "w+");
-	hnode* travel;
-	travel = hl->head;
-	while(travel != NULL) {
-		fputc(travel->data, fp);
-		travel = travel->next;
+	vnode *vtravel;
+	hnode *htravel;
+
+	vtravel = vl->top;
+
+	if(vtravel == NULL) {
+		return ;	
 	}
+	if(vtravel == vl->bottom){
+		htravel = vtravel->row;
+		if(htravel == NULL) {
+			return ;	
+		}
+		if(htravel->next == NULL){
+			fputc(htravel->data, fp);
+			return;
+		}
+		do {
+			fputc(htravel->data, fp);
+			htravel = htravel->next;
+		}while(htravel != NULL);
+		return;
+	}
+	do{
+		htravel = vtravel->row;
+		do{
+			fputc(htravel->data, fp);
+			htravel = htravel->next;
+		}while(htravel != NULL);
+		vtravel = vtravel->next;
+	}while(vtravel != NULL);
 	fclose(fp);
 	
 }
@@ -154,14 +74,51 @@ void print_loc(int y, int x) {
 	move(y, x);
 }
 
+void print_list(vlist *vl){
+	vnode *vtravel;
+	hnode *htravel;
+
+	vtravel = vl->top;
+
+	if(vtravel == NULL) {
+		return ;	
+	}
+	if(vtravel == vl->bottom){
+		htravel = vtravel->row;
+		if(htravel == NULL) {
+			return ;	
+		}
+		if(htravel->next == NULL){
+			printw("%c", htravel->data);
+			return;
+		}
+		do {
+			printw("%c", htravel->data);
+			htravel = htravel->next;
+		}while(htravel != NULL);
+		return;
+	}
+	do{
+		htravel = vtravel->row;
+		do{
+			printw("%c", htravel->data);
+			htravel = htravel->next;
+		}while(htravel != NULL);
+		vtravel = vtravel->next;
+	}while(vtravel != NULL);
+	
+}
+
 int main(int argc, char *argv[]) {
 	char ch;
 	
-	hlist hl;
+	hlist hl;	
+	vlist vl;
 
 	int i, flag = 0;
 	if(argc == 2) {
 		init_hlist(&hl);
+		init_vlist(&vl);
 		initscr();
 		raw();
 		noecho();
@@ -185,27 +142,30 @@ int main(int argc, char *argv[]) {
 				case (char)KEY_RIGHT:
 					//flag = 1;
 					//move_right(&l);
-					if(length(hl) > x)
+					if(hlength(hl) > x)
 						move(y, ++x);
 					refresh();
 					break;
 				case 'q':
 					break;
-				/*case '\n':
-					insert(&l, ch, x);
-					clear();
-					print_hlist(l);
-					move(++y, ++x);
-					refresh();
-					break;	
-				*/default : 
-					insert(&hl, ch, x);
+				case '\n':
+					hinsert(&hl, ch, x);
+					init_hlist(&hl);
+					y++;
+					x = 0;
+					move(y, x);	
+					break;
+					
+				default : 
+					hinsert(&hl, ch, x);
+					if(hlength(hl) == 1)
+						vinsert(&vl, &hl, y);
 					//addch(ch);
 					//x++;
-					
+					if(x == 0)
+						vreplace(&vl, &hl, y);
 					clear();
-						
-					print_hlist(hl);	
+					print_list(&vl);	
 					move(y, ++x);
 					refresh();	
 					break;
@@ -213,7 +173,7 @@ int main(int argc, char *argv[]) {
 			refresh();
 			//print_prompt();	
 			if(ch == 'q') {
-				save_file(&hl, argv[1]);
+				save_file(&vl, &hl, argv[1]);
 				break;
 			}
 		}
