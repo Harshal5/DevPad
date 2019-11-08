@@ -95,3 +95,15 @@ void print_hlist(hlist hl) {
 	}while(temp != NULL);
 	
 }
+
+void hbreak(hlist *hl, int x){
+	int i;
+	hnode *temp;
+	temp = hl->head;
+	for(i = 0;i < x; i++){
+		temp = temp->next;
+	}
+	hl->head = temp->next;
+	hl->head->prev = NULL;
+	temp->next = NULL;
+}

@@ -150,6 +150,16 @@ int main(int argc, char *argv[]) {
 					break;
 				case '\n':
 					hinsert(&hl, ch, x);
+					if(x == 0){
+						vinsert(&vl, &hl, y);
+					}
+					/*if(x < hlength(hl)){
+					//	x++;
+						hbreak(&hl, x);
+						vinsert(&vl, &hl, y+1);
+						
+
+					}*/
 					init_hlist(&hl);
 					y++;
 					x = 0;
@@ -162,8 +172,8 @@ int main(int argc, char *argv[]) {
 						vinsert(&vl, &hl, y);
 					//addch(ch);
 					//x++;
-					if(x == 0)
-						vreplace(&vl, &hl, y);
+					//if(x == 0)
+					//	vreplace(&vl, &hl, y);
 					clear();
 					print_list(&vl);	
 					move(y, ++x);
@@ -180,4 +190,4 @@ int main(int argc, char *argv[]) {
 		endwin();
 	}
 	return 0;
-}	
+}
