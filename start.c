@@ -192,11 +192,13 @@ int main(int argc, char *argv[]) {
 								temp = temp->next;
 								x++;
 						}
-						if(hl.head == NULL)
+						hl.rear = temp;
+						if(hl.head == NULL) 
 							move(++y, x);
+						else if(hl.rear->data != '\n')
+							move(++y, x);	
 						else
 							move(++y, --x);
-						hl.rear =temp;
 					}
 					break;
 						
