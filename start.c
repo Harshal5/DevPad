@@ -100,6 +100,8 @@ void print_list(vlist *vl){
 	}
 	do{
 		htravel = vtravel->row;
+		if(htravel == NULL)
+			return;
 		do{
 			printw("%c", htravel->data);
 			htravel = htravel->next;
@@ -108,6 +110,14 @@ void print_list(vlist *vl){
 	}while(vtravel != NULL);
 	
 }
+
+void traverse_and_assign(vlist *vl, hlist *hl, int y){
+						vnode *t;
+						t = vl->top;
+						for(int i=0; i < y; i++)
+							t = t->next;
+						t->row = hl->head;
+					}	
 
 int main(int argc, char *argv[]) {
 	char ch;
@@ -149,27 +159,66 @@ int main(int argc, char *argv[]) {
 				case 'q':
 					break;
 				case '\n':
-					hinsert(&hl, ch, x);
-					if(x == 0){
+					if(vl.top == NULL){
 						vinsert(&vl, &hl, y);
+						hinsert(&hl, ch, x);
+						vl.top->row = hl.head;
+						init_hlist(&hl);
 					}
-					/*if(x < hlength(hl)){
-					//	x++;
+					else if(x == 0){
+						hinsert(&hl, ch, x);
+						//remove later add traverse
+						traverse_and_assign(&vl, &hl, y);
+						x++;
 						hbreak(&hl, x);
 						vinsert(&vl, &hl, y+1);
-						
 
-					}*/
-					init_hlist(&hl);
-					y++;
-					x = 0;
-					move(y, x);	
+					}
+
+					else if(x < hlength(hl)){
+						hinsert(&hl, ch, x);
+						//traverse_and_assign(&vl, &hl, y);
+						x++;
+						hbreak(&hl, x);
+						vinsert(&vl, &hl, y+1);
+						// add traverse
+
+
+						//delete later
+						//vl.bottom->row = hl.head;
+					}
+					else{
+						hinsert(&hl, ch, x);
+						//vinsert(&vl, &hl, y);
+						init_hlist(&hl);
+
+					}
+
+					//try for x<len
+					
+					//y++;
+					//x = 0;
+					clear();
+					print_list(&vl);
+					move(++y, x = 0);	
+					refresh();
 					break;
 					
 				default : 
 					hinsert(&hl, ch, x);
-					if(hlength(hl) == 1)
+					if((x == 0)&&(hlength(hl) == 1))
 						vinsert(&vl, &hl, y);
+					// add traverse
+					/*	vnode *t;
+						t = vl.top;
+						for(i=0;i<y;i++)
+							t = t->next;
+						t->row = hl.head;	
+					*/traverse_and_assign(&vl, &hl, y);
+						
+
+						//delete later
+					//vl.bottom->row = hl.head;	
 					//addch(ch);
 					//x++;
 					//if(x == 0)

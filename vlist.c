@@ -60,6 +60,7 @@ void vinsert (vlist *vl, hlist *hl, int pos){
 	if (pos == vlen) {
 		new_vnode->prev = vl->bottom;
 		new_vnode->next = NULL;
+		//new_vnode->row = NULL;
 		vl->bottom->next = new_vnode;
 		vl->bottom = new_vnode;
 		return;

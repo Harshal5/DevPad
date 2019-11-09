@@ -40,6 +40,7 @@ void hinsert (hlist *hl, char c, int pos) {
 	
 	new_hnode = (hnode*)malloc(sizeof(hnode));
 	new_hnode->data = c;
+
 	if(hlen == 0) {
 		hl->head = new_hnode;
 		hl->rear = new_hnode;
@@ -100,7 +101,7 @@ void hbreak(hlist *hl, int x){
 	int i;
 	hnode *temp;
 	temp = hl->head;
-	for(i = 0;i < x; i++){
+	for(i = 0;i < x-1; i++){
 		temp = temp->next;
 	}
 	hl->head = temp->next;
