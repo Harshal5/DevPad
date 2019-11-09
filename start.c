@@ -120,7 +120,7 @@ void traverse_and_assign(vlist *vl, hlist *hl, int y){
 					}	
 
 int main(int argc, char *argv[]) {
-	char ch;
+	char ch, prev_ch;
 	
 	hlist hl;	
 	vlist vl;
@@ -138,6 +138,7 @@ int main(int argc, char *argv[]) {
 		getyx(stdscr, y, x);
 		while(1) {
 		print_loc(y, x);
+			
 			ch = getch();
 			switch(ch) {
 				case (char)KEY_LEFT:
@@ -167,12 +168,17 @@ int main(int argc, char *argv[]) {
 					}
 					else if(x == 0){
 						hinsert(&hl, ch, x);
-						//remove later add traverse
-						traverse_and_assign(&vl, &hl, y);
-						x++;
-						hbreak(&hl, x);
-						vinsert(&vl, &hl, y+1);
-
+						if(hlength(hl) == 1){
+							vinsert(&vl, &hl, y);
+							init_hlist(&hl);
+						}
+						else{
+							//remove later add traverse
+							traverse_and_assign(&vl, &hl, y);
+							x++;
+							hbreak(&hl, x);
+							vinsert(&vl, &hl, y+1);
+						}
 					}
 
 					else if(x < hlength(hl)){
@@ -235,6 +241,7 @@ int main(int argc, char *argv[]) {
 				save_file(&vl, &hl, argv[1]);
 				break;
 			}
+			prev_ch = ch;
 		}
 		endwin();
 	}
