@@ -10,6 +10,9 @@
 #include "vlist.h"
 int x, y;
 
+vnode *current;
+hnode *temp;
+
 void save_file(vlist *vl, hlist *hl, char *file_name) {
 
 	FILE *fp;
@@ -117,7 +120,7 @@ void traverse_and_assign(vlist *vl, hlist *hl, int y){
 						for(int i=0; i < y; i++)
 							t = t->next;
 						t->row = hl->head;
-					}	
+}	
 
 int main(int argc, char *argv[]) {
 	char ch, prev_ch;
@@ -153,10 +156,53 @@ int main(int argc, char *argv[]) {
 				case (char)KEY_RIGHT:
 					//flag = 1;
 					//move_right(&l);
-					if(hlength(hl) > x)
-						move(y, ++x);
+					if(hlength(hl) > x){
+						if((vlength(vl) > y) &&((x == (hlength(hl)-1)))){
+
+						}
+						else	
+							move(y, ++x);
+						
+					}
 					refresh();
 					break;
+				case (char)KEY_UP:
+					if((y>0)&&(current->prev != NULL)){
+
+						x = 0; //taking x to 1 then moving it forward
+						if(hlength(hl) != 0)
+							current = current->prev;
+						hl.head = current->row;
+						temp = hl.head;
+						while(((temp->next) != NULL)){
+								temp = temp->next;
+								x++;
+						}
+						move(--y, x);
+						hl.rear = temp;	
+					}	
+					break;	
+				case (char)KEY_DOWN:
+					if((vlength(vl)-1) > y) {
+						x = 1;
+						current = current->next;
+						hl.head = current->row;
+						temp = hl.head;
+						while(((temp->next) != NULL)){
+								temp = temp->next;
+								x++;
+						}
+						if(hl.head == NULL)
+							move(++y, x);
+						else
+							move(++y, --x);
+						hl.rear =temp;
+					}
+					break;
+						
+				case (char)KEY_BACKSPACE:
+					break;		
+
 				case 'q':
 					break;
 				case '\n':
@@ -165,11 +211,13 @@ int main(int argc, char *argv[]) {
 						hinsert(&hl, ch, x);
 						vl.top->row = hl.head;
 						init_hlist(&hl);
+						current = vl.bottom;
 					}
 					else if(x == 0){
 						hinsert(&hl, ch, x);
-						if(hlength(hl) == 1){
+						if(hlength(hl) == 1){ //forr double \n 
 							vinsert(&vl, &hl, y);
+							current = current->next;//
 							init_hlist(&hl);
 						}
 						else{
@@ -178,6 +226,7 @@ int main(int argc, char *argv[]) {
 							x++;
 							hbreak(&hl, x);
 							vinsert(&vl, &hl, y+1);
+							current = current->next;
 						}
 					}
 
@@ -189,7 +238,7 @@ int main(int argc, char *argv[]) {
 						vinsert(&vl, &hl, y+1);
 						// add traverse
 
-
+						current = current->next;
 						//delete later
 						//vl.bottom->row = hl.head;
 					}
@@ -197,13 +246,14 @@ int main(int argc, char *argv[]) {
 						hinsert(&hl, ch, x);
 						//vinsert(&vl, &hl, y);
 						init_hlist(&hl);
-
+						//current = current->next;
 					}
 
 					//try for x<len
 					
 					//y++;
 					//x = 0;
+					
 					clear();
 					print_list(&vl);
 					move(++y, x = 0);	
@@ -212,8 +262,10 @@ int main(int argc, char *argv[]) {
 					
 				default : 
 					hinsert(&hl, ch, x);
-					if((x == 0)&&(hlength(hl) == 1))
+					if((x == 0)&&(hlength(hl) == 1)){   //
 						vinsert(&vl, &hl, y);
+						current = vl.bottom;
+					}
 					// add traverse
 					/*	vnode *t;
 						t = vl.top;
@@ -221,9 +273,13 @@ int main(int argc, char *argv[]) {
 							t = t->next;
 						t->row = hl.head;	
 					*/traverse_and_assign(&vl, &hl, y);
-						
 
-						//delete later
+
+					if(vlength(vl) == 1)
+						current = vl.bottom;
+										
+
+				    //delete later
 					//vl.bottom->row = hl.head;	
 					//addch(ch);
 					//x++;
