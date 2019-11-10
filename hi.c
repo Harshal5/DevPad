@@ -1,9 +1,4 @@
-saszxdfas
-sadas
-dasd
-as
-fd
-assd
-sadsadasdasd
-asdas
-dasdasdas
+#include<stdio.hs>
+void main() {
+	printf("Hello World");dqsd
+}

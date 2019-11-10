@@ -8,10 +8,19 @@
 #include <fcntl.h>
 #include "hlist.h"
 #include "vlist.h"
-int x, y, ROWS, COLS;
+int x = 0, y = 0, ROWS, COLS;
 int arr_len = 1;
 vnode *current;
 hnode *temp;
+
+int exists(char *a) {
+	FILE *fp;
+	fp = fopen(a, "r");
+	if(fp != NULL) 
+		return 1;
+	else
+		return 0;
+}
 
 void save_file(vlist *vl, hlist *hl, char *file_name) {
 
@@ -336,31 +345,87 @@ void quit(vlist *vl) {
    		vnow = next;
 	}
 }
+
+
+void read_file(vlist *vl, hlist *hl, char *filename) {
+	FILE *fp;
+	int ch;
+	//int ROWS, COLS;
+	int x = 0, y = 0;
+	fp = fopen(filename, "r");
+	initscr();
+	raw();
+	noecho();
+	//getmaxyx(stdscr, ROWS, COLS);
+	keypad(stdscr, TRUE);
+	init_hlist(hl);
+	init_vlist(vl);
+	ch = fgetc(fp);
+	while(ch != EOF) {
+		switch(ch) {
+			case '\n':
+				//hinsert(hl, ch, x);
+				x++;
+				/*if(hlength(*hl) == 1){ //forr double \n 
+					vinsert(vl, hl, y);
+					current = current->next;//
+				}*/
+					init_hlist(hl);
+					y++;
+					x = 0;
+
+			default:
+				hinsert(hl, ch, x);
+				if((x == 0)&&(hlength(*hl) == 1)){   //
+					vinsert(vl, hl, y);
+					current = vl->bottom;
+				}
+					//traverse_and_assign(&vl, &hl, y);
+					//if(vlength(*vl) == 1)
+					//	current = vl->bottom;
+					x++;	
+				break;
+		}
+		ch = fgetc(fp);
+	}
+	fclose(fp);
+}	
 	
 int main(int argc, char *argv[]) {
-	char ch, prev_ch, *arr, *c;
+	char ch, *arr, *c;
 	
 	hlist hl;	
 	vlist vl;
 
 	arr = (char*)malloc(10*sizeof(char));
 
-	int i, j, m, flag = 0;
+	int i, m;
 	if(argc == 2) {
-		init_hlist(&hl);
-		init_vlist(&vl);
-		initscr();
-		raw();
-		noecho();
-		refresh();
-		keypad(stdscr, TRUE);
+		if(exists(argv[1]))
+			read_file(&vl, &hl, argv[1]);
+		else{
+			initscr();
+			raw();
+			noecho();
+			refresh();
+			keypad(stdscr, TRUE);
+			init_hlist(&hl);
+			init_vlist(&vl);
+					
+		}		
+
 		move(0, 0);
+		current = vl.top;
 		getyx(stdscr, y, x);
 		getmaxyx(stdscr, ROWS, COLS);
+			print_list(&vl);
+			move(0, 0);
+			refresh();
 		while(1) {
 		print_loc(y, x);
-			
+	
 			ch = getch();
+			//clear();
 			switch(ch) {
 				case (char)KEY_LEFT:
 					//printw("left");
@@ -554,6 +619,7 @@ int main(int argc, char *argv[]) {
 						vinsert(&vl, &hl, y);
 						current = vl.bottom;
 					}
+					
 					// add traverse
 					/*	vnode *t;
 						t = vl.top;
@@ -584,7 +650,7 @@ int main(int argc, char *argv[]) {
 			if((ch == (char)KEY_F(7)) && (m == 1)) {
 				break;
 			}
-			prev_ch = ch;
+		
 		}
 		endwin();
 	}
