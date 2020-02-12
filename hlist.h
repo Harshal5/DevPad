@@ -1,3 +1,4 @@
+//Horizontal Nodes
 typedef struct hnode {
 	char data;
 	struct hnode *prev, *next;

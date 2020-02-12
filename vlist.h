@@ -1,3 +1,4 @@
+//Vertical Nodes
 typedef struct vnode {
 	hnode *row;
 	struct vnode *prev, *next;
