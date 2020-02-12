@@ -1,4 +1,3 @@
-
 #include<stdio.h>
 #include<stdlib.h>
 #include<ncurses.h>
@@ -9,13 +8,17 @@
 #include <fcntl.h>
 #include "hlist.h"
 #include "vlist.h"
+
 void init_vlist(vlist *vl){
+
 	vl->top = NULL;
 	vl->bottom = NULL;
+
 }
 
 
 int vlength (vlist vl){
+
 	vnode *temp;
 	temp = vl.top;
 	if(temp == NULL) {
@@ -30,8 +33,10 @@ int vlength (vlist vl){
 		vlen++;
 	}while(temp != vl.bottom);
 	return vlen;
+
 }
 void vinsert (vlist *vl, hlist *hl, int pos){
+	
 	vnode *temp, *new_vnode;
 	int vlen, i = 0;
 	vlen = vlength(*vl);
@@ -76,13 +81,16 @@ void vinsert (vlist *vl, hlist *hl, int pos){
 	new_vnode->next = temp->next;
 	temp->next->prev = new_vnode;
 	temp->next = new_vnode;
+
 }
 
 void vreplace(vlist *vl, hlist *hl, int y){
+
 	vnode *vtemp;
 	vtemp = vl->top;
 	while(y--){
 		vtemp = vtemp->next;
 	}
-	vtemp->row = hl->head;
+		vtemp->row = hl->head;
+
 }

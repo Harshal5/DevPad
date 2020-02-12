@@ -9,11 +9,14 @@
 #include "hlist.h"
 
 void init_hlist(hlist *hl) {
+
 	hl->head = NULL;
 	hl->rear = NULL;
+
 }
 
 int hlength (hlist hl) {
+
 	hnode *temp;
 	temp = hl.head;
 	if(temp == NULL) {
@@ -28,9 +31,11 @@ int hlength (hlist hl) {
 		hlen++;
 	}while(temp != hl.rear);
 	return hlen;
+
 }
 
 void hinsert (hlist *hl, char c, int pos) {
+
 	hnode *temp, *new_hnode;
 	int hlen, i = 0;
 	hlen = hlength(*hl);
@@ -77,9 +82,11 @@ void hinsert (hlist *hl, char c, int pos) {
 	new_hnode->next = temp->next;
 	temp->next->prev = new_hnode;
 	temp->next = new_hnode;
+
 }
 
 void print_hlist(hlist hl) {
+
 	hnode *temp;
 	temp = hl.head;	
 	if(temp == NULL) {
@@ -98,6 +105,7 @@ void print_hlist(hlist hl) {
 }
 
 void hbreak(hlist *hl, int x){
+
 	int i;
 	hnode *temp;
 	temp = hl->head;
@@ -107,4 +115,5 @@ void hbreak(hlist *hl, int x){
 	hl->head = temp->next;
 	hl->head->prev = NULL;
 	temp->next = NULL;
+
 }
